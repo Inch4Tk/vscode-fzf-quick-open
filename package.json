@@ -80,6 +80,12 @@
           "default": false,
           "description": "Forces the use of .ignore in fd and rg"
         },
+        "fzf-quick-open.closeTerminalAfterSearch": {
+          "scope": "window",
+          "type": "boolean",
+          "default": false,
+          "description": "Close the terminal automatically after search."
+        },
         "fzf-quick-open.findDirectoriesCmd": {
           "scope": "window",
           "type": "string",

@@ -20,6 +20,7 @@ let fzfPipe: string | undefined;
 let fzfPipeScript: string;
 let useWorkspaceFoldersFzf: boolean;
 let useWorkspaceFoldersRg: boolean;
+let closeTerminalAfterSearch: boolean;
 let forceIgnoreFile: boolean;
 let windowsNeedsEscape = false;
 let fzfQuote = "'";
@@ -97,6 +98,7 @@ function applyConfig() {
 	useWorkspaceFoldersFzf = cfg.get('useWorkspaceFoldersFzf') as boolean;
 	useWorkspaceFoldersRg = cfg.get('useWorkspaceFoldersRg') as boolean;
 	forceIgnoreFile = cfg.get('forceIgnoreFile') as boolean;
+	closeTerminalAfterSearch = cfg.get('closeTerminalAfterSearch') as boolean;
 	initialCwd = cfg.get('initialWorkingDirectory') as string;
 	let rgopt = cfg.get('ripgrepSearchStyle') as string;
 	rgFlags = (rgflagmap.get(rgopt) ?? "--case-sensitive") + ' ';
@@ -189,6 +191,17 @@ function getQuote() {
 }
 
 function processCommandInput(data: Buffer) {
+	// close terminal
+	if (closeTerminalAfterSearch) {
+		let termname = window.activeTerminal?.name;
+		if (termname == fzfTerminal?.name) {
+			fzfTerminal?.hide();
+		} else if (termname == fzfTerminalPwd?.name) {
+			fzfTerminalPwd?.hide();
+		}
+	}
+
+	// process command
 	let [cmd, pwd, arg] = data.toString().trim().split('$$');
 	cmd = cmd.trim(); pwd = pwd.trim(); arg = arg.trim();
 	if (arg === "") { return }
@@ -291,22 +304,26 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('fzf-quick-open.runFzfFile', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
+		fzfTerminal = term;
 		term.sendText(getCodeOpenFileCmd(), true);
 	}));
 
 	context.subscriptions.push(commands.registerCommand('fzf-quick-open.runFzfFilePwd', () => {
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
+		fzfTerminalPwd = term;
 		moveToPwd(term);
 		term.sendText(getCodeOpenFileCmd(), true);
 	}));
 
 	context.subscriptions.push(commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolder', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
+		fzfTerminal = term;
 		term.sendText(`${getFindCmd()} | ${getCodeOpenFolderCmd()}`, true);
 	}));
 
 	context.subscriptions.push(commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolderPwd', () => {
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
+		fzfTerminalPwd = term;
 		moveToPwd(term);
 		term.sendText(`${getFindCmd()} | ${getCodeOpenFolderCmd()}`, true);
 	}));
@@ -317,6 +334,7 @@ export function activate(context: ExtensionContext) {
 			return;
 		}
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
+		fzfTerminal = term;
 		term.sendText(makeSearchCmd(pattern), true);
 	}));
 
@@ -326,6 +344,7 @@ export function activate(context: ExtensionContext) {
 			return;
 		}
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
+		fzfTerminalPwd = term;
 		moveToPwd(term);
 		term.sendText(makeSearchCmd(pattern), true);
 	}));
