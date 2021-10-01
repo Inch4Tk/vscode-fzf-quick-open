@@ -62,6 +62,24 @@
           "default": "",
           "description": "Initial working directory for fzf"
         },
+        "fzf-quick-open.useWorkspaceFoldersFzf": {
+          "scope": "window",
+          "type": "boolean",
+          "default": false,
+          "description": "Use the workspace folders as input to fzf in open file queries (triggered via fd)."
+        },
+        "fzf-quick-open.useWorkspaceFoldersRg": {
+          "scope": "window",
+          "type": "boolean",
+          "default": false,
+          "description": "Use the workspace folders as input to rg in file search."
+        },
+        "fzf-quick-open.forceIgnoreFile": {
+          "scope": "window",
+          "type": "boolean",
+          "default": false,
+          "description": "Forces the use of .ignore in fd and rg"
+        },
         "fzf-quick-open.findDirectoriesCmd": {
           "scope": "window",
           "type": "string",
